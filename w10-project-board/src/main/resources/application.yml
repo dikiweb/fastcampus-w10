@@ -1,0 +1,148 @@
+debug: false
+
+# 액추에이터 설정 정보
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #beans,health,metrics
+      base-path: /manage
+      path-mapping:
+        health: healthcheck
+  endpoint:
+    metrics:
+      enabled: true
+    health:
+      enabled: true
+      show-details: always
+    beans:
+      enabled: true
+# 로깅
+logging.level:
+  root: INFO
+  SQL: DEBUG
+  org.springframework.web.servlet: debug
+  org.hibernate.sql: debug  # debug  trace
+  org.hibernate.type: trace
+  org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+# DataBase
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/dikidev?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: dikidev
+    password: hjc91070
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create #create, none, update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 100
+        use_sql_comments: true
+    open-in-view: true
+
+  sql.init.mode: always
+
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+    rest:
+      base-path: /api
+      detection-strategy: annotated
+
+  mvc:
+    hidden-method:
+      filter:
+        enabled: true
+
+  main:
+    allow-bean-definition-overriding: true
+
+  thymeleaf:
+    prefix: classpath:templates/
+    check-template-location: true
+    suffix: .html
+    mode: HTML
+    cache: false
+
+  #Encoding UTF-8
+  sql:
+    init:
+      encoding: utf-8
+
+  # Lazy-loading으로 인해 empty-beans이 생길 수 있다. 너그럽게 빈 객체를 허락해주는 옵션이다.
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+#  mail:
+#    host: smtp.mailplug.co.kr
+#    port: 465
+#    username: webmaster@nidc.kr
+#    password: 5wlddjWkaQhd!
+#    protocol: smtps
+#    default-encoding: UTF-8
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+
+  # OAUTH
+  profiles:
+    include: oauth
+
+  # 메시지 설정
+  messages:
+    basename: messages
+    fallback-to-system-locale: false
+
+  # 파일 업로드 설정
+#  servlet:
+#    multipart:
+#      max-file-size: 10MB
+#      max-request-size: 10MB
+#      enabled: true
+
+# 업로드된 파일 저장 위치 설정
+#upload:
+#custom:
+#  path:
+#    uri-path: '/static/upload'
+#    location-path: 'E:\0x000 workspace\ckeditor\src\main\resources\static\upload'
+
+server:
+  servlet:
+    session:
+      timeout: 10m
+    encoding:
+      charset: UTF-8
+      force: true
+  error:
+    include-exception: true
+    include-stacktrace: always
+    whitelabel:
+      enabled: false
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: testdb
+#  datasource:
+#    url: jdbc:h2:mem:board;model=mysql
+#    driver-class-name: org.h2.Driver
+#  sql:
+#    init:
+#      mode: always
+#  test.database.replace: none
+
