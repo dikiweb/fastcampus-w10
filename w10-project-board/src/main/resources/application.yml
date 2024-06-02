@@ -96,11 +96,13 @@ spring:
 #            enable: true
 #            required: true
 
+
   # OAUTH
+
   profiles:
     include: oauth
-
   # 메시지 설정
+
   messages:
     basename: messages
     fallback-to-system-locale: false
@@ -131,18 +133,3 @@ server:
     include-stacktrace: always
     whitelabel:
       enabled: false
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: testdb
-#  datasource:
-#    url: jdbc:h2:mem:board;model=mysql
-#    driver-class-name: org.h2.Driver
-#  sql:
-#    init:
-#      mode: always
-#  test.database.replace: none
-
