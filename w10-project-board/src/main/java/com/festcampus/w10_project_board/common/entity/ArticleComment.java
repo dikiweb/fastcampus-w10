@@ -38,13 +38,14 @@ public class ArticleComment extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50)
-    private String userId; // 유저 정보 (ID) : 임시조치
-
+    @Setter
+    @JoinColumn(name = "userId")
+    @ManyToOne(optional = false)
+    private UserAccount userAccount; // 유저 정보 (ID)
 
     @Setter
     @Column(updatable = false)
-    private Long parentCommentId; // 부모 댓글 ID : 임시조치
+    private Long parentCommentId; // 부모 댓글 ID
 
     @Setter
     @ManyToOne(optional = false)
