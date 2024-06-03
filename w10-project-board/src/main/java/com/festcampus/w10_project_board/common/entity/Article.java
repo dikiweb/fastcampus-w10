@@ -32,7 +32,7 @@ import java.util.Set;
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
         @Index(columnList = "createdAt"),
-        @Index(columnList = "createdBy"),
+        @Index(columnList = "createdBy")
 })
 @Entity
 public class Article extends AuditingFields {
@@ -41,8 +41,10 @@ public class Article extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50)
-    private String userId; // 유저 정보 (ID) : 임시조치
+    @Setter
+    @JoinColumn(name = "userId")
+    @ManyToOne(optional = false)
+    private UserAccount userAccount;   // 유저 정보 (ID)
 
     @Setter
     @Column(nullable = false, length = 255)
@@ -50,7 +52,7 @@ public class Article extends AuditingFields {
 
     @Setter
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;  // 내용
+    private String content;  // 본문 내용
 
     @Setter
     private String hashtag;  // 해시테크
