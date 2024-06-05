@@ -58,10 +58,34 @@
             <table class="table" id="article-table">
                 <thead>
                 <tr>
-                    <th class="title col-6"><a>제목</a></th>
-                    <th class="hashtag col-2"><a>해시태그</a></th>
-                    <th class="user-id"><a>작성자</a></th>
-                    <th class="created-at"><a>작성일</a></th>
+                    <th class="title col-6">
+                        <a th:text="제목"
+                           th:href="@{/articles(
+                           page=${articles.number},
+                           sort='title' + (${articles.sort.getOrderFor('title')} != null ? (${articles.sort.getOrderFor('title').direction.name} != 'DESC' ? ',desc' : '') : '')
+                           )}">제목</a>
+                    </th>
+                    <th class="hashtag col-2">
+                        <a th:text="해시태그"
+                           th:href="@{/articles(
+                           page=${articles.number},
+                           sort='hashtags' + (${articles.sort.getOrderFor('hashtags')} != null ? (${articles.sort.getOrderFor('hashtags').direction.name} != 'DESC' ? ',desc' : '') : '')
+                           )}">해시태그</a>
+                    </th>
+                    <th class="user-id">
+                        <a th:text="작성자"
+                           th:href="@{/articles(
+                           page=${articles.number},
+                           sort='userAccount.userId' + (${articles.sort.getOrderFor('userAccount.userId')} != null ? (${articles.sort.getOrderFor('userAccount.userId').direction.name} != 'DESC' ? ',desc' : '') : '')
+                           )}">작성자</a>
+                    </th>
+                    <th class="created-at">
+                        <a th:text="작성일"
+                           th:href="@{/articles(
+                           page=${articles.number},
+                           sort='createdAt' + (${articles.sort.getOrderFor('createdAt')} != null ? (${articles.sort.getOrderFor('createdAt').direction.name} != 'DESC' ? ',desc' : '') : '')
+                           )}">작성일</a>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
