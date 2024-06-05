@@ -86,9 +86,24 @@
         <div class="row">
             <nav id="pagination" aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           th:text="Previous"
+                           th:href="@{/articles(page=${articles.number - 1})}"
+                           th:class="'page-link' + (${articles.number} <= 0 ? ' disabled' : '')">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="pageNumber : ${paginationBarNumbers}">
+                        <a class="page-link"
+                           th:text="${pageNumber + 1}"
+                           th:href="@{/articles(page=${pageNumber})}"
+                           th:class="'page-link' + (${pageNumber} == ${articles.number} ? ' disabled':'')">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           th:text="Next"
+                           th:href="@{/articles(page=${articles.number + 1})}"
+                           th:class="'page-link' + (${articles.number} >= ${articles.totalPages -1} ? ' disabled':'')">Next</a>
+                    </li>
                 </ul>
             </nav>
         </div>
