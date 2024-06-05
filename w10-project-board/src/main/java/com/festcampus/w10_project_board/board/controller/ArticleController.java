@@ -1,11 +1,20 @@
 package com.festcampus.w10_project_board.board.controller;
 
+import com.festcampus.w10_project_board.board.dto.response.ArticleResponse;
+import com.festcampus.w10_project_board.board.dto.response.ArticleWithCommentsResponse;
+import com.festcampus.w10_project_board.board.service.ArticleService;
+import com.festcampus.w10_project_board.common.entity.constant.SearchType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -20,20 +29,33 @@ import java.util.List;
  * -----------------------------------------------------------
  * 2024-06-02          danny         최초 생성
  */
+@RequiredArgsConstructor
 @RequestMapping("/articles")
 @Controller
 public class ArticleController {
 
+    private final ArticleService articleService;
+
+
     @GetMapping
-    public String articles(Model model) {
-        model.addAttribute("articles", List.of());
+    public String articles(
+            @RequestParam(required = false, name = "searchType") SearchType searchType,
+            @RequestParam(required = false, name = "searchValue") String searchValue,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC ) Pageable pageable,
+            Model model
+    ) {
+        model.addAttribute("articles", articleService.searchArticls(searchType, searchValue, pageable).map(ArticleResponse::from));
         return "articles/list";
     }
 
     @GetMapping("/{articleId}")
-    public String article(@PathVariable(name = "articleId") Long articleId,  Model model) {
-        model.addAttribute("article", "article");  // TODO: 실제 구현할 때 Data Binding 해 줘야 합니다.
-        model.addAttribute("articlesComments", List.of());
+    public String article(
+            @PathVariable(name = "articleId") Long articleId,
+            Model model
+    ) {
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
+        model.addAttribute("article", article);
+        model.addAttribute("articlesComments", article.articleCommentsResponse());
         return "articles/detail";
     }
 }

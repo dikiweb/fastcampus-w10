@@ -65,23 +65,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td class="title"><a>첫글</a></td>
-                    <td class="hashtag"><span class="badge text-bg-secondary mx-1"><a class="text-reset">#java</a></span></td>
-                    <td class="user-id">Uno</td>
-                    <td class="created-at"><time>2022-01-01</time></td>
-                </tr>
-                <tr>
-                    <td>두번째글</td>
-                    <td>#spring</td>
-                    <td>Uno</td>
-                    <td><time>2022-01-02</time></td>
-                </tr>
-                <tr>
-                    <td>세번째글</td>
-                    <td>#java</td>
-                    <td>Uno</td>
-                    <td><time>2022-01-03</time></td>
+                <tr th:each="article : ${articles}">
+                    <td class="title">
+                        <a th:text="${article.title()}" th:href="@{|/articles/${article.id()}|}">첫 글 제목</a>
+                    </td>
+                    <td class="hashtag" th:text="${article.hashtags()}"><span class="badge text-bg-secondary mx-1"><a class="text-reset">#java</a></span></td>
+                    <td class="user-id" th:text="${article.nickname()}">Uno</td>
+                    <td class="created-at" th:datetime="${article.createdAt()}" th:text="${#temporals.format(article.createdAt(), 'yyyy-MM-dd HH:mm')}"><time>2022-01-01</time></td>
                 </tr>
                 </tbody>
             </table>
