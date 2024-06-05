@@ -4,7 +4,9 @@ import com.festcampus.w10_project_board.board.dto.response.ArticleResponse;
 import com.festcampus.w10_project_board.board.dto.response.ArticleWithCommentsResponse;
 import com.festcampus.w10_project_board.board.service.ArticleService;
 import com.festcampus.w10_project_board.common.entity.constant.SearchType;
+import com.festcampus.w10_project_board.common.service.PaginationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -35,7 +37,7 @@ import java.util.List;
 public class ArticleController {
 
     private final ArticleService articleService;
-
+    private final PaginationService paginationService;
 
     @GetMapping
     public String articles(
@@ -44,7 +46,12 @@ public class ArticleController {
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC ) Pageable pageable,
             Model model
     ) {
-        model.addAttribute("articles", articleService.searchArticls(searchType, searchValue, pageable).map(ArticleResponse::from));
+        Page<ArticleResponse> articles = articleService.searchArticls(searchType, searchValue, pageable).map(ArticleResponse::from);
+        List<Integer> barNumbers = paginationService.getPaginationBara(pageable.getPageNumber(), articles.getTotalPages());
+
+        model.addAttribute("articles", articles);
+        model.addAttribute("paginationBarNumbers", barNumbers);
+
         return "articles/list";
     }
 
