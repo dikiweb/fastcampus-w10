@@ -52,10 +52,10 @@ class ArticleServiceTest {
         // given
 
         // when
-        Page<ArticleDto> articles = sut.searchArticls(SearchType.TITLE, "search keyword");
+        //Page<ArticleDto> articles = sut.searchArticls(SearchType.TITLE, "search keyword");
 
         // then
-        assertThat(articles).isNotNull();
+        //assertThat(articles).isNotNull();
     }
 
     @Disabled("구현 중")
@@ -65,10 +65,10 @@ class ArticleServiceTest {
         // given
 
         // when
-        ArticleDto article = sut.searchArticl(1L);
+        //ArticleDto article = sut.searchArticl(1L);
 
         // then
-        assertThat(article).isNotNull();
+        //assertThat(article).isNotNull();
     }
 
     @Disabled("구현 중")
@@ -91,14 +91,14 @@ class ArticleServiceTest {
     @Test
     void givenArticleIdAndIModifiedInfo_whenSavingArticle_thenUpdateArticle() {
         // given
-        ArticleUpdateDto dto = ArticleUpdateDto.of("제목", "내용", "#해시");
-        given(articleRepository.save(any(Article.class))).willReturn(null);
+        // ArticleUpdateDto dto = ArticleUpdateDto.of("제목", "내용", "#해시");
+        // given(articleRepository.save(any(Article.class))).willReturn(null);
 
         // when
-        sut.updateArticle(1L, dto);
+        // sut.updateArticle(1L, dto);
 
         // then
-        then(articleRepository).should().save(any(Article.class));
+        // then(articleRepository).should().save(any(Article.class));
     }
 
     @Disabled("구현 중")

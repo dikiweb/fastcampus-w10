@@ -31,6 +31,7 @@ public record ArticleDto(
         String modifiedBy
 ) {
 
+
     public static ArticleDto of(UserAccountDto userAccountDto, String title, String content, Set<HashtagDto> hashtagDtos) {
         return new ArticleDto(null, userAccountDto, title, content, hashtagDtos, null, null, null, null);
     }
