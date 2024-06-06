@@ -51,6 +51,7 @@ public class ArticleController {
 
         model.addAttribute("articles", articles);
         model.addAttribute("paginationBarNumbers", barNumbers);
+        model.addAttribute("searTypes", SearchType.values());
 
         return "articles/list";
     }

@@ -1,5 +1,6 @@
 package com.festcampus.w10_project_board.board.repository;
 
+import com.festcampus.w10_project_board.board.repository.querydsl.ArticleRepositoryCustom;
 import com.festcampus.w10_project_board.common.entity.Article;
 import com.festcampus.w10_project_board.common.entity.QArticle;
 import com.querydsl.core.types.dsl.DateTimeExpression;
@@ -28,6 +29,7 @@ import java.time.DateTimeException;
 @RepositoryRestResource(excerptProjection = ArticleRepository.class)
 public interface ArticleRepository extends
         JpaRepository<Article, Long>,
+        ArticleRepositoryCustom,
         QuerydslPredicateExecutor<Article>,
         QuerydslBinderCustomizer<QArticle>
 {
@@ -36,10 +38,8 @@ public interface ArticleRepository extends
     Page<Article> findByContentContaining(String content, Pageable pageable);
     Page<Article> findByUserAccount_UserIdContaining(String userId, Pageable pageable);
     Page<Article> findByUserAccount_NicknameContaining(String nickname, Pageable pageable);
-//    Page<Article> findByHashtag(String hastag, Pageable pageable);
 
     void deleteByIdAndUserAccount_UserId(Long articleId, String userid);
-
 
     @Override
     default void customize(QuerydslBindings bindings, QArticle root){

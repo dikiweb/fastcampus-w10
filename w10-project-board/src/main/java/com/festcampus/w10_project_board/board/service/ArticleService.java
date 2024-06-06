@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -42,15 +43,17 @@ public class ArticleService {
             return articleRepository.findAll(pageable).map(ArticleDto::from);
         }
 
-        switch (searchType) {
+        return switch (searchType) {
             case TITLE -> articleRepository.findByTitleContaining(searchKeyword, pageable).map(ArticleDto::from);
             case CONTENT -> articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDto::from);
             case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
-//            case HASHTAG -> articleRepository.findByHashtag("#" + searchKeyword, pageable).map(ArticleDto::from);
-        }
-
-        return Page.empty();
+            case HASHTAG -> articleRepository
+                    .findByHashtagNames(
+                            Arrays.stream(searchKeyword.split(" ")).toList(), pageable
+                    )
+                    .map(ArticleDto::from);
+        };
     }
 
     @Transactional(readOnly = true)
@@ -66,6 +69,8 @@ public class ArticleService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다. - article: " + articleId));
     }
 
+
+    // TODO : 인증과 연결해서 저장 하는것 다시 작업 해야합니다
     public void saveArticle(ArticleDto dto) {
 //        articleRepository.save(dto.toEntity());
     }
