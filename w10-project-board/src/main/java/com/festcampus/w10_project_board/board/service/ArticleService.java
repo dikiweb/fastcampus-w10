@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,8 +58,27 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public ArticleDto searchArticl(long articleId) {
+    public ArticleDto searchArticle(long articleId) {
         return null;
+    }
+
+    public long getArticleCount() {
+        return articleRepository.count();
+    }
+
+    // TODO: HashtagService 로 이동을 고려해보자.
+    public List<String> getHashtags() {
+        return articleRepository.findAllDistinctHashtags();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
+
+        if (hashtagName == null || hashtagName.isBlank()) {
+            return Page.empty(pageable);
+        }
+
+        return articleRepository.findByHashtagNames(List.of(hashtagName), pageable).map(ArticleDto::from);
     }
 
     @Transactional(readOnly = true)

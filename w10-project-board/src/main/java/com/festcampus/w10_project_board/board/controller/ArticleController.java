@@ -1,5 +1,6 @@
 package com.festcampus.w10_project_board.board.controller;
 
+import com.festcampus.w10_project_board.board.dto.ArticleDto;
 import com.festcampus.w10_project_board.board.dto.response.ArticleResponse;
 import com.festcampus.w10_project_board.board.dto.response.ArticleWithCommentsResponse;
 import com.festcampus.w10_project_board.board.service.ArticleService;
@@ -66,4 +67,25 @@ public class ArticleController {
         model.addAttribute("articlesComments", article.articleCommentsResponse());
         return "articles/detail";
     }
+
+    @GetMapping("/search-hashtag")
+    public String searchArticleHashtag(
+            @RequestParam(required = false, name = "searchValue") String searchValue,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC ) Pageable pageable,
+            Model model
+    ) {
+
+        Page<ArticleResponse> articles = articleService.searchArticlesViaHashtag(searchValue, pageable).map(ArticleResponse::from);
+        List<String> hashtags = articleService.getHashtags();
+        List<Integer> barNumbers = paginationService.getPaginationBara(pageable.getPageNumber(), articles.getTotalPages());
+
+
+        model.addAttribute("articles", articles);
+        model.addAttribute("hashtags", hashtags);
+        model.addAttribute("paginationBarNumbers", barNumbers);
+        model.addAttribute("searchType", SearchType.HASHTAG);
+
+        return "articles/search-hashtag";
+    }
+
 }
