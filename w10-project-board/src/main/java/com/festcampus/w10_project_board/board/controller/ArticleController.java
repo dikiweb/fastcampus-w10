@@ -1,23 +1,23 @@
 package com.festcampus.w10_project_board.board.controller;
 
 import com.festcampus.w10_project_board.board.dto.ArticleDto;
+import com.festcampus.w10_project_board.board.dto.request.ArticleRequest;
 import com.festcampus.w10_project_board.board.dto.response.ArticleResponse;
 import com.festcampus.w10_project_board.board.dto.response.ArticleWithCommentsResponse;
 import com.festcampus.w10_project_board.board.service.ArticleService;
 import com.festcampus.w10_project_board.common.entity.constant.SearchType;
 import com.festcampus.w10_project_board.common.service.PaginationService;
+import com.festcampus.w10_project_board.userAccount.dto.security.SitePrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,10 +41,10 @@ public class ArticleController {
     private final PaginationService paginationService;
 
     @GetMapping
-    public String articles(
+    public String listArticles(
             @RequestParam(required = false, name = "searchType") SearchType searchType,
             @RequestParam(required = false, name = "searchValue") String searchValue,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC ) Pageable pageable,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model
     ) {
         Page<ArticleResponse> articles = articleService.searchArticls(searchType, searchValue, pageable).map(ArticleResponse::from);
@@ -58,7 +58,7 @@ public class ArticleController {
     }
 
     @GetMapping("/{articleId}")
-    public String article(
+    public String detailArticle(
             @PathVariable(name = "articleId") Long articleId,
             Model model
     ) {
@@ -71,7 +71,7 @@ public class ArticleController {
     @GetMapping("/search-hashtag")
     public String searchArticleHashtag(
             @RequestParam(required = false, name = "searchValue") String searchValue,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC ) Pageable pageable,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model
     ) {
 
@@ -88,4 +88,35 @@ public class ArticleController {
         return "articles/search-hashtag";
     }
 
+    @GetMapping("/{articleId}/form")
+    public String updateArticleForm(
+            @PathVariable(name = "articleId") Long articleId,
+            Model model
+    ) {
+
+
+        return "articles/form";
+    }
+
+    @PostMapping("/{articleId}/form")
+    public String updateArticle(
+            @PathVariable(name = "articleId") Long articleId,
+            @AuthenticationPrincipal SitePrincipal sitePrincipal,
+            ArticleRequest articleRequest
+    ) {
+
+        articleService.updateArticle(articleId, articleRequest.toDto(sitePrincipal.toDto()));
+
+        return "redirect:/articles/" + articleId;
+    }
+
+    @PostMapping("/{articleId}/delete")
+    public String deleteArticle(
+            @PathVariable(name = "articleId") Long articleId,
+            @AuthenticationPrincipal SitePrincipal sitePrincipal
+            ) {
+        articleService.deleteArticle(articleId, sitePrincipal.getUsername());
+
+        return "redirect:/articles";
+    }
 }
