@@ -33,6 +33,6 @@ public class JpaConfig {
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
                 .map(SitePrincipal.class::cast)
-                .map(SitePrincipal::username);
+                .map(SitePrincipal::getUsername);
     }
 }

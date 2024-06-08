@@ -24,7 +24,7 @@
                 <div class="text-end">
                     <span id="username" class="text-white me-2"
                           sec:authorize="isAuthenticated()"
-                          sec:authentication="name">username</span>
+                          sec:authentication="principal.username">username</span>
                     <a role="button" id="login" class="btn btn-outline-light me-2"
                        sec:authorize="!isAuthenticated()"
                        th:href="@{/login}">Login</a>

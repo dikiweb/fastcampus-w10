@@ -42,7 +42,6 @@ public class HashtagService {
 
         Pattern pattern = Pattern.compile("#[\\w가-힣]+");
         Matcher matcher = pattern.matcher(content.strip());
-
         HashSet<String> result = new HashSet<>();
 
         while (matcher.find()) {

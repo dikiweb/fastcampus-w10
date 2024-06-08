@@ -1,5 +1,6 @@
 package com.festcampus.w10_project_board.board.repository;
 
+import com.festcampus.w10_project_board.board.repository.querydsl.HashtagRepositoryCustom;
 import com.festcampus.w10_project_board.common.entity.Hashtag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -23,6 +24,7 @@ import java.util.Set;
 @RepositoryRestResource
 public interface HashtagRepository extends
         JpaRepository<Hashtag, Long>,
+        HashtagRepositoryCustom,
         QuerydslPredicateExecutor<Hashtag>
 
 {

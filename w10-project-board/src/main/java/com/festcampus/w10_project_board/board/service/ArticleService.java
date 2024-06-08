@@ -1,9 +1,9 @@
 package com.festcampus.w10_project_board.board.service;
 
 import com.festcampus.w10_project_board.board.dto.ArticleDto;
-import com.festcampus.w10_project_board.board.dto.ArticleUpdateDto;
 import com.festcampus.w10_project_board.board.dto.ArticleWithCommentsDto;
 import com.festcampus.w10_project_board.board.repository.ArticleRepository;
+import com.festcampus.w10_project_board.board.repository.HashtagRepository;
 import com.festcampus.w10_project_board.common.entity.Article;
 import com.festcampus.w10_project_board.common.entity.Hashtag;
 import com.festcampus.w10_project_board.common.entity.UserAccount;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,12 +39,26 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleService {
 
+    private final HashtagService hashtagService;
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
-    private final HashtagService hashtagService;
+    private final HashtagRepository hashtagRepository;
 
+    /**
+     *  게시물 전체 수
+     *
+     */
+    public long getArticleCount() {
+
+        return articleRepository.count();
+    }
+
+    /**
+     *  게시물 검색 + 목록 조회
+     *
+     */
     @Transactional(readOnly = true)
-    public Page<ArticleDto> searchArticls(SearchType searchType, String searchKeyword, Pageable pageable) {
+    public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
 
         if (searchKeyword == null || searchKeyword.isBlank()) {
             return articleRepository.findAll(pageable).map(ArticleDto::from);
@@ -64,42 +77,39 @@ public class ArticleService {
         };
     }
 
+    /**
+     *  게시물 CRUD
+     *
+     */
+    // 게시글 + 댓들 조회
     @Transactional(readOnly = true)
-    public ArticleDto searchArticle(long articleId) {
-        return null;
-    }
+    public ArticleWithCommentsDto getArticleWithComments(Long articleId) {
 
-    public long getArticleCount() {
-        return articleRepository.count();
-    }
-
-    // TODO: HashtagService 로 이동을 고려해보자.
-    public List<String> getHashtags() {
-        return articleRepository.findAllDistinctHashtags();
-    }
-
-    @Transactional(readOnly = true)
-    public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
-
-        if (hashtagName == null || hashtagName.isBlank()) {
-            return Page.empty(pageable);
-        }
-
-        return articleRepository.findByHashtagNames(List.of(hashtagName), pageable).map(ArticleDto::from);
-    }
-
-    @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticle(Long articleId) {
         return articleRepository
                 .findById(articleId)
                 .map(ArticleWithCommentsDto::from)
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다. - article: " + articleId));
     }
 
+    // 게시글 만 조회
+    @Transactional(readOnly = true)
+    public ArticleDto getArticle(Long articleId) {
 
-    // TODO : 인증과 연결해서 저장 하는것 다시 작업 해야합니다
+        return articleRepository
+                .findById(articleId)
+                .map(ArticleDto::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+    }
+
     public void saveArticle(ArticleDto dto) {
-//        articleRepository.save(dto.toEntity());
+
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+        Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+
+        Article article = dto.toEntity(userAccount);
+        article.addHashtags(hashtags);
+
+        articleRepository.save(article);
     }
 
     public void updateArticle(Long articleId, ArticleDto dto) {
@@ -133,11 +143,43 @@ public class ArticleService {
 
     }
 
-    public void deleteArticle(long articleId, String userId) {
+    public void deleteArticle(Long articleId, String userId) {
+
+        Article article = articleRepository.getReferenceById(articleId);
+        Set<Long> hashtagIds = article.getHashtags()
+                .stream()
+                .map(Hashtag::getId)
+                .collect(Collectors.toUnmodifiableSet());
+
         articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
+        articleRepository.flush();
+
+        hashtagIds.forEach(hashtagService::deleteHashtagWithoutArticles);
+    }
+
+
+    /**
+     *  Hashtag 관련
+     *
+     */
+
+    @Transactional(readOnly = true)
+    public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
+
+        if (hashtagName == null || hashtagName.isBlank()) {
+            return Page.empty(pageable);
+        }
+
+        return articleRepository.findByHashtagNames(List.of(hashtagName), pageable).map(ArticleDto::from);
+    }
+
+    public List<String> getHashtags() {
+
+        return hashtagRepository.findAllHashtagNames();  // TODO: HashtagService 로 이동을 고려해보자.
     }
 
     private Set<Hashtag> renewHashtagsFromContent(String content) {
+
         Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
         Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent);
         Set<String> existingHashtagNames = hashtags.stream().map(Hashtag::getHashtagName).collect(Collectors.toUnmodifiableSet());
@@ -147,6 +189,8 @@ public class ArticleService {
                 hashtags.add(Hashtag.of(newHashtagName));
             }
         });
+
         return hashtags;
     }
+
 }

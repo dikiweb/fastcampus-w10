@@ -1,10 +1,10 @@
 package com.festcampus.w10_project_board.board.controller;
 
 import com.festcampus.w10_project_board.board.dto.request.ArticleCommentRequest;
-import com.festcampus.w10_project_board.board.dto.request.ArticleRequest;
 import com.festcampus.w10_project_board.board.service.ArticleCommentService;
-import com.festcampus.w10_project_board.userAccount.dto.UserAccountDto;
+import com.festcampus.w10_project_board.userAccount.dto.security.SitePrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,20 +29,26 @@ public class ArticleCommentController {
     private final ArticleCommentService articleCommentService;
 
     @PostMapping("/new")
-    public String postNewArticleComment(ArticleCommentRequest articleCommentRequest) {
-        // TODO 인증정보를 넣어야 합니다
-        articleCommentService.saveArticleComment(articleCommentRequest.toDto(UserAccountDto.of("diki", "1234", null, null, null)));
+    public String postNewArticleComment(
+            @AuthenticationPrincipal SitePrincipal sitePrincipal,
+            ArticleCommentRequest articleCommentRequest
+    ) {
 
-        return "redirect:/articles" + articleCommentRequest.articleId();
+        articleCommentService.saveArticleComment(
+                articleCommentRequest.toDto(sitePrincipal.toDto())
+        );
+
+        return "redirect:/articles/" + articleCommentRequest.articleId();
     }
 
     @PostMapping("/{commentId}/delete")
     public String deleteArticleComment(
             @PathVariable(name = "commentId") Long commentId,
+            @AuthenticationPrincipal SitePrincipal sitePrincipal,
             Long articleId
     ) {
-        // TODO 인증정보를 넣어야 합니다
-        articleCommentService.deleteArticleComment(commentId, "diki");
-        return null;
+        articleCommentService.deleteArticleComment(commentId, sitePrincipal.getUsername());
+
+        return "redirect:/articles/" + articleId;
     }
 }

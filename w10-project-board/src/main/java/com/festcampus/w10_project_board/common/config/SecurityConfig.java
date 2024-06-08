@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers(
                                 "/",
                                 "/articles",
@@ -46,12 +47,15 @@ public class SecurityConfig {
 
         // 사용자 정의 로그인 폼
         http
-                .formLogin(formLogin -> formLogin
-                        .loginProcessingUrl("/login").permitAll());
+                .formLogin(formLogin -> formLogin.permitAll());
 
         // 사용자 정의 로그아웃
         http
                 .logout(logout -> logout.logoutSuccessUrl("/"));
+
+        //CSRF  -- ignoringAntMatchers의 새 이름이  ignoringRequestMatchers 이다.
+        http
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
         return http.build();
     }

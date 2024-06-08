@@ -1,10 +1,10 @@
 package com.festcampus.w10_project_board.board.controller;
 
-import com.festcampus.w10_project_board.board.dto.ArticleDto;
 import com.festcampus.w10_project_board.board.dto.request.ArticleRequest;
 import com.festcampus.w10_project_board.board.dto.response.ArticleResponse;
 import com.festcampus.w10_project_board.board.dto.response.ArticleWithCommentsResponse;
 import com.festcampus.w10_project_board.board.service.ArticleService;
+import com.festcampus.w10_project_board.common.entity.constant.FormStatus;
 import com.festcampus.w10_project_board.common.entity.constant.SearchType;
 import com.festcampus.w10_project_board.common.service.PaginationService;
 import com.festcampus.w10_project_board.userAccount.dto.security.SitePrincipal;
@@ -16,7 +16,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,8 +46,15 @@ public class ArticleController {
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model
     ) {
-        Page<ArticleResponse> articles = articleService.searchArticls(searchType, searchValue, pageable).map(ArticleResponse::from);
+        Page<ArticleResponse> articles = articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBara(pageable.getPageNumber(), articles.getTotalPages());
+
+        model.addAttribute("seoAuthor", "By Daniel Park (Park jong chul)");
+        model.addAttribute("seoGenerator", "By IntelliJ IDEA");
+        model.addAttribute("seoDescript", "SEO  사이트 설명 입력할 곳");
+        model.addAttribute("seoKeyword", "SEO 키워드 입력할 곳");
+
+        model.addAttribute("title", "게시판 목록");
 
         model.addAttribute("articles", articles);
         model.addAttribute("paginationBarNumbers", barNumbers);
@@ -62,7 +68,15 @@ public class ArticleController {
             @PathVariable(name = "articleId") Long articleId,
             Model model
     ) {
-        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticle(articleId));
+        ArticleWithCommentsResponse article = ArticleWithCommentsResponse.from(articleService.getArticleWithComments(articleId));
+
+        model.addAttribute("seoAuthor", "By Daniel Park (Park jong chul)");
+        model.addAttribute("seoGenerator", "By IntelliJ IDEA");
+        model.addAttribute("seoDescript", "SEO  사이트 설명 입력할 곳");
+        model.addAttribute("seoKeyword", "SEO 키워드 입력할 곳");
+
+        model.addAttribute("title", "게시판 상세보기 : " + article.title());
+
         model.addAttribute("article", article);
         model.addAttribute("articlesComments", article.articleCommentsResponse());
         return "articles/detail";
@@ -79,6 +93,12 @@ public class ArticleController {
         List<String> hashtags = articleService.getHashtags();
         List<Integer> barNumbers = paginationService.getPaginationBara(pageable.getPageNumber(), articles.getTotalPages());
 
+        model.addAttribute("seoAuthor", "By Daniel Park (Park jong chul)");
+        model.addAttribute("seoGenerator", "By IntelliJ IDEA");
+        model.addAttribute("seoDescript", "SEO  사이트 설명 입력할 곳");
+        model.addAttribute("seoKeyword", "SEO 키워드 입력할 곳");
+
+        model.addAttribute("title", "게시판 해시태그 목록");
 
         model.addAttribute("articles", articles);
         model.addAttribute("hashtags", hashtags);
@@ -87,6 +107,33 @@ public class ArticleController {
 
         return "articles/search-hashtag";
     }
+
+    @GetMapping("/form")
+    public String articleForm(Model model) {
+
+        model.addAttribute("seoAuthor", "By Daniel Park (Park jong chul)");
+        model.addAttribute("seoGenerator", "By IntelliJ IDEA");
+        model.addAttribute("seoDescript", "SEO  사이트 설명 입력할 곳");
+        model.addAttribute("seoKeyword", "SEO 키워드 입력할 곳");
+
+        model.addAttribute("title", "게시글");
+        model.addAttribute("formStatus", FormStatus.CREATE);
+
+        return "articles/form";
+    }
+
+    @PostMapping("/form")
+    public String postNewArticle(
+            @AuthenticationPrincipal SitePrincipal sitePrincipal,
+            ArticleRequest articleRequest
+    ) {
+
+        articleService.saveArticle(articleRequest.toDto(sitePrincipal.toDto()));
+
+        return "redirect:/articles";
+
+    }
+
 
     @GetMapping("/{articleId}/form")
     public String updateArticleForm(
