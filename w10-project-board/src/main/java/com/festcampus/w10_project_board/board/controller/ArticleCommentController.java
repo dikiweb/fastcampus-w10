@@ -43,7 +43,7 @@ public class ArticleCommentController {
 
     @PostMapping("/{commentId}/delete")
     public String deleteArticleComment(
-            @PathVariable(name = "commentId") Long commentId,
+            @PathVariable Long commentId,
             @AuthenticationPrincipal SitePrincipal sitePrincipal,
             Long articleId
     ) {

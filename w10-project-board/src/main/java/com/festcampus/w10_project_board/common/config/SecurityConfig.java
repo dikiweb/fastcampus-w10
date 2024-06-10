@@ -7,6 +7,7 @@ import jakarta.servlet.DispatcherType;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -47,7 +48,12 @@ public class SecurityConfig {
 
         // 사용자 정의 로그인 폼
         http
-                .formLogin(formLogin -> formLogin.permitAll());
+                .formLogin(formLogin -> formLogin
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/", true)
+                );
+//                .formLogin(Customizer.withDefaults());
 
         // 사용자 정의 로그아웃
         http
