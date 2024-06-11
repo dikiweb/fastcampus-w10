@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleService {
 
-    private final HashtagService hashtagService;
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
+    private final HashtagService hashtagService;
     private final HashtagRepository hashtagRepository;
 
     /**
@@ -127,7 +127,11 @@ public class ArticleService {
                     article.setContent(dto.content());
                 }
 
-                Set<Long> hashtagIds = article.getHashtags().stream().map(Hashtag::getId).collect(Collectors.toUnmodifiableSet());
+                Set<Long> hashtagIds = article
+                        .getHashtags()
+                        .stream()
+                        .map(Hashtag::getId)
+                        .collect(Collectors.toUnmodifiableSet());
                 article.clearHashtags();
                 articleRepository.flush();
 
@@ -146,7 +150,8 @@ public class ArticleService {
     public void deleteArticle(Long articleId, String userId) {
 
         Article article = articleRepository.getReferenceById(articleId);
-        Set<Long> hashtagIds = article.getHashtags()
+        Set<Long> hashtagIds = article
+                .getHashtags()
                 .stream()
                 .map(Hashtag::getId)
                 .collect(Collectors.toUnmodifiableSet());
@@ -170,7 +175,9 @@ public class ArticleService {
             return Page.empty(pageable);
         }
 
-        return articleRepository.findByHashtagNames(List.of(hashtagName), pageable).map(ArticleDto::from);
+        return articleRepository
+                .findByHashtagNames(List.of(hashtagName), pageable)
+                .map(ArticleDto::from);
     }
 
     public List<String> getHashtags() {
@@ -182,7 +189,10 @@ public class ArticleService {
 
         Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
         Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent);
-        Set<String> existingHashtagNames = hashtags.stream().map(Hashtag::getHashtagName).collect(Collectors.toUnmodifiableSet());
+        Set<String> existingHashtagNames = hashtags
+                .stream()
+                .map(Hashtag::getHashtagName)
+                .collect(Collectors.toUnmodifiableSet());
 
         hashtagNamesInContent.forEach(newHashtagName -> {
             if (!existingHashtagNames.contains(newHashtagName)) {
