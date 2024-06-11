@@ -36,6 +36,10 @@ public class Article extends AuditingFields {
     private Long id;
 
     @Setter
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String content;  // 본문 내용
+
+    @Setter
     @JoinColumn(name = "userId")
     @ManyToOne(optional = false)
     private UserAccount userAccount;   // 유저 정보 (ID)
@@ -43,10 +47,6 @@ public class Article extends AuditingFields {
     @Setter
     @Column(nullable = false, length = 255)
     private String title;  // 제목
-
-    @Setter
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;  // 본문 내용
 
     @ToString.Exclude
     @JoinTable(

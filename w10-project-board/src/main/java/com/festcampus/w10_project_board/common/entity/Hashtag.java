@@ -34,13 +34,12 @@ public class Hashtag extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ToString.Exclude
-    @ManyToMany(mappedBy = "hashtags")
-    private Set<Article> articles = new LinkedHashSet<>();
-
     @Setter @Column(nullable = false)
     private String hashtagName; // 해시태그 이름
 
+    @ToString.Exclude
+    @ManyToMany(mappedBy = "hashtags")
+    private Set<Article> articles = new LinkedHashSet<>();
 
     protected Hashtag() {}
 
