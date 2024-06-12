@@ -45,12 +45,12 @@ public class ArticleComment extends AuditingFields {
 
     @Setter
     @Column(updatable = false)
-    private Long parentCommentId; // 부모 댓글 ID
+    private Long parentCommentId; // 부모 댓글 ID : 단방향 연결 예시 / 부모를 세팅 후 업데이트를 하지 못해야 함
 
     @ToString.Exclude
     @OrderBy("createdAt ASC")
     @OneToMany(mappedBy = "parentCommentId", cascade = CascadeType.ALL)
-    private Set<ArticleComment> childComments = new LinkedHashSet<>();
+    private Set<ArticleComment> childComments = new LinkedHashSet<>(); // 부모 댓글을 지우면 자식 댓글도 모두 삭제
 
     @Setter
     @Column(nullable = false, length = 500)
@@ -69,6 +69,7 @@ public class ArticleComment extends AuditingFields {
         return new ArticleComment(article, userAccount, null, content);
     }
 
+    // 부모자식관계 세팅
     public void addChildComment(ArticleComment child) {
         child.setParentCommentId(this.getId());
         this.getChildComments().add(child);
