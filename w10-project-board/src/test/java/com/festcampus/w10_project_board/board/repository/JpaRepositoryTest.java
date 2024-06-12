@@ -2,6 +2,8 @@ package com.festcampus.w10_project_board.board.repository;
 
 import com.festcampus.w10_project_board.common.config.JpaConfig;
 import com.festcampus.w10_project_board.common.entity.Article;
+import com.festcampus.w10_project_board.common.entity.ArticleComment;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -35,8 +38,7 @@ class JpaRepositoryTest {
 
     public JpaRepositoryTest(
             @Autowired ArticleRepository articleRepository,
-            @Autowired ArticleCommentRepository articleCommentRepository)
-    {
+            @Autowired ArticleCommentRepository articleCommentRepository) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
     }
@@ -100,5 +102,21 @@ class JpaRepositoryTest {
         // then
         assertThat(articleRepository.count()).isEqualTo(previousCount - 1);
         assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - deletedCommentsSize);
+    }
+
+
+    @Test
+    @DisplayName("대댓글 조회")
+    void givenParentCommentId_whenSelecting_thenReturnCilds () {
+        // given
+
+        // when
+        Optional<ArticleComment> parentComment = articleCommentRepository.findById(1L);
+
+        // then
+        assertThat(parentComment).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                    .hasSize(5);
     }
 }
