@@ -49,7 +49,8 @@ public record ArticleWithCommentsResponse(
                 dto.id(),
                 dto.title(),
                 dto.content(),
-                dto.hashtagDtos().stream()
+                dto.hashtagDtos()
+                        .stream()
                         .map(HashtagDto::hashtagName)
                         .collect(Collectors.toUnmodifiableSet())
                 ,
@@ -63,18 +64,23 @@ public record ArticleWithCommentsResponse(
 
 
     private static Set<ArticleCommentResponse> organizeChildComments(Set<ArticleCommentDto> dtos) {
-        Map<Long, ArticleCommentResponse> map = dtos.stream()
+        Map<Long, ArticleCommentResponse> map = dtos
+                .stream()
                 .map(ArticleCommentResponse::from)
                 .collect(Collectors.toMap(ArticleCommentResponse::id, Function.identity()));
 
-        map.values().stream()
+        map
+                .values()
+                .stream()
                 .filter(ArticleCommentResponse::hasParentComment)
                 .forEach(comment -> {
                     ArticleCommentResponse parentComment = map.get(comment.parentCommentId());
                     parentComment.childComments().add(comment);
                 });
 
-        return map.values().stream()
+        return map
+                .values()
+                .stream()
                 .filter(comment -> !comment.hasParentComment())
                 .collect(Collectors.toCollection(() ->
                         new TreeSet<>(Comparator

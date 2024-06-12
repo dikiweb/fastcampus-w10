@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * packageName   : com.festcampus.w10_project_board.board.repository
+ * packageName  : com.festcampus.w10_project_board.board.repository
  * fileName     : JpaRepositoryTest
  * author       : danny
  * date         : 2024-06-01
@@ -119,4 +119,5 @@ class JpaRepositoryTest {
                 .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
                     .hasSize(5);
     }
+
 }
