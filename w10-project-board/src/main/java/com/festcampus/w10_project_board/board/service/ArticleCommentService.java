@@ -53,7 +53,7 @@ public class ArticleCommentService {
 
             if (dto.parentCommentId() != null) {
                 ArticleComment parentComment = articleCommentRepository.getReferenceById(dto.parentCommentId());
-                parentComment.addChildComment(parentComment);
+                parentComment.addChildComment(articleComment);
             } else {
                 articleCommentRepository.save(articleComment);
             }
