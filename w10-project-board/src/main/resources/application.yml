@@ -29,11 +29,10 @@ logging.level:
 # DataBase
 spring:
   datasource:
-#    url: jdbc:postgresql://localhost:5432/dikidev
-    url: jdbc:mariadb://localhost:3306/dikidev?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
-    username: dikidev
-    password: hjc91070
 
   jpa:
     defer-datasource-initialization: true
@@ -82,11 +81,12 @@ spring:
     serialization:
       fail-on-empty-beans: false
 
+  # 메일 기능을 위한 SMTP 설정
 #  mail:
-#    host: smtp.mailplug.co.kr
-#    port: 465
-#    username: webmaster@nidc.kr
-#    password: 5wlddjWkaQhd!
+#    host: ${SMTP_MAIL_HOST}
+#    port: ${SMTP_MAIL_PORT}
+#    username: ${SMTP_MAIL_USERNAME}
+#    password: ${SMTP_MAIL_PASSWORD}
 #    protocol: smtps
 #    default-encoding: UTF-8
 #    properties:
@@ -97,18 +97,30 @@ spring:
 #            enable: true
 #            required: true
 
-
-  # OAUTH
-
-  profiles:
-    include: oauth
   # 메시지 설정
-
   messages:
     basename: messages
     fallback-to-system-locale: false
 
-  # 파일 업로드 설정
+  # OAUTH
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_OAUTH_CLIENT_ID}
+            client-secret: ${KAKAO_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
+            client-authentication-method: POST #client_secret_post
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+# 파일 업로드 설정
 #  servlet:
 #    multipart:
 #      max-file-size: 10MB
