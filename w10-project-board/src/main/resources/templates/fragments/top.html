@@ -24,7 +24,10 @@
                 <div class="text-end">
                     <span id="username" class="text-white me-2"
                           sec:authorize="isAuthenticated()"
-                          sec:authentication="principal.username">username</span>
+                          sec:authentication="principal.nickname">nickname</span>
+                    <a role="button" id="kakao-login" class="me-2"
+                       sec:authorize="!isAuthenticated()"
+                       th:href="@{/oauth2/authorization/kakao}"><img alt="kakao login" th:src="@{/assets/images/kakao_login_medium_narrow.png}"></a>
                     <a role="button" id="login" class="btn btn-outline-light me-2"
                        sec:authorize="!isAuthenticated()"
                        th:href="@{/login}">Login</a>
